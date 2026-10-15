@@ -1,0 +1,10 @@
+# Dependencias solo para desarrollo y pruebas.
+#
+# moto levanta un servidor S3 simulado en Python: es lo que usa el CI para
+# verificar que el pipeline escribe y lee el crudo en un bucket, sin necesidad de
+# contenedores ni de credenciales reales.
+#
+#   pip install -r requirements-dev.txt
+#   moto_server -p 9000
+#
+moto[server]>=5.0
