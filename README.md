@@ -466,4 +466,5 @@ El código se publica bajo licencia **MIT** (ver [`LICENSE`](LICENSE)).
 ---
 
 Proyecto de portafolio de **Mario Alejandro Rebellón**.
-[LinkedIn](https://www.linkedin.com/in/mario-alejandro-rebellon-brito-ba109428a/)
+[LinkedIn](https://www.linkedin.com/in/mario-alejandro-rebellon-brito-ba109428a/) y
+[portafolio completo](https://alejandro1431.github.io/).
