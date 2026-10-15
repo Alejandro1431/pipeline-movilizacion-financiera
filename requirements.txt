@@ -1,0 +1,15 @@
+# Dependencias del pipeline (versiones fijadas tras verificar el entorno).
+pandas==3.0.1
+pyarrow>=21.0.0
+duckdb>=1.4.0
+requests>=2.32.0
+pytest>=8.4.0
+
+# Modelo dimensional
+dbt-duckdb>=1.9.0
+
+# Orquestación
+prefect>=3.1.0
+
+# Almacenamiento en la nube (solo se usa si PIPELINE_ALMACEN=s3)
+boto3>=1.35.0

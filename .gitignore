@@ -1,0 +1,24 @@
+# Datos generados por el pipeline: no se versionan.
+data/
+*.duckdb
+
+# Entorno virtual
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Herramientas
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+
+# dbt
+dbt/target/
+dbt/logs/
+dbt/dbt_packages/
+dbt/package-lock.yml
+dbt/.user.yml
+
+# Secretos y configuración local
+.env

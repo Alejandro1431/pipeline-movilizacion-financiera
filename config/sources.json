@@ -1,0 +1,35 @@
+{
+  "movilizacion_municipio": {
+    "dataset": "xcga-ji4i",
+    "titulo": "Reporte de movilización mensual por municipio y departamento",
+    "entidad": "Superintendencia Financiera de Colombia",
+    "dominio": "www.datos.gov.co",
+    "particion": "a_o",
+    "columna_fecha": "fecha_de_informaci_n",
+    "columna_id": "id_fila",
+    "columnas_clave": ["a_o", "mes", "cod_mun"],
+    "notas": "Grano: un registro por municipio y mes. Nombres de columna con guion bajo porque el origen los publica con tildes."
+  },
+  "movilizacion_intermediario": {
+    "dataset": "xbk8-edux",
+    "titulo": "Reporte de movilización mensual por intermediario financiero",
+    "entidad": "Superintendencia Financiera de Colombia",
+    "dominio": "www.datos.gov.co",
+    "particion": "a_o",
+    "columna_fecha": "fecha_de_informaci_n",
+    "columna_id": "id_fila",
+    "columnas_clave": ["a_o", "mes", "nombre_intermediario"],
+    "notas": "Grano: un registro por intermediario y mes. El origen anonimiza los nombres (BAN100 SA), así que no se puede cruzar con el nombre real de la entidad."
+  },
+  "desembolsos_redescuento": {
+    "dataset": "bu9y-ytgi",
+    "titulo": "Desembolsos redescuento y crédito directo",
+    "entidad": "Findeter",
+    "dominio": "www.datos.gov.co",
+    "particion": "ano",
+    "columna_fecha": null,
+    "columna_id": "id_fila",
+    "columnas_clave": ["ano", "departamento", "sector"],
+    "notas": "Fuente sucia a propósito: el valor viene como texto con formato de moneda y la ubicación como objeto anidado GeoJSON. Sin columna de fecha, así que siempre se recarga completa."
+  }
+}
