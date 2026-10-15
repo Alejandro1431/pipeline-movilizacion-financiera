@@ -1,0 +1,15 @@
+name: 'movilizacion_financiera'
+version: '1.0.0'
+config-version: 2
+
+# El perfil vive en dbt/profiles.yml para que el proyecto sea reproducible:
+# no depende de la configuracion global de ~/.dbt de cada maquina.
+profile: 'movilizacion_financiera'
+
+model-paths: ["models"]
+test-paths: ["tests"]
+clean-targets: ["target", "dbt_packages", "logs"]
+
+models:
+  movilizacion_financiera:
+    +materialized: table

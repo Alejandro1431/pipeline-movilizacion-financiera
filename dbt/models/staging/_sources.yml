@@ -1,0 +1,48 @@
+version: 2
+
+sources:
+  - name: staging
+    description: >
+      Tablas que construye el pipeline de Python a partir del crudo en Parquet.
+      No las crea dbt: dbt las lee como origen para construir el modelo
+      dimensional. El orden del pipeline es extract, transform y luego marts.
+    schema: staging
+    tables:
+      - name: movilizacion_municipio
+        description: >
+          Movilización mensual por municipio. Grano: un registro por año, mes y
+          municipio. Las 38 filas que el origen publica repetidas sin columna que
+          las distinga ya vienen agregadas con SUM desde el staging.
+        columns:
+          - name: periodo
+            description: Primer día del mes al que corresponde el registro.
+          - name: codigo_municipio
+            description: Código DANE del municipio, con ceros a la izquierda.
+          - name: valor_movilizado
+            description: Valor total movilizado en pesos.
+          - name: filas_origen
+            description: Cuántas filas del origen se agregaron para formar este registro.
+
+      - name: movilizacion_intermediario
+        description: >
+          Movilización mensual por intermediario financiero. Grano: un registro
+          por año, mes e intermediario. El nombre viene anonimizado por el
+          publicador.
+        columns:
+          - name: nombre_intermediario
+            description: Identificador anonimizado de la entidad (por ejemplo BAN100 SA).
+          - name: tipo_intermediario
+            description: Bancos, cooperativas, fintech, etc.
+
+      - name: desembolsos_redescuento
+        description: >
+          Desembolsos de redescuento y crédito directo por departamento y sector.
+          El origen publica los valores como texto con formato de moneda y la
+          ubicación como objeto anidado; el pipeline los limpia antes de esta capa.
+        columns:
+          - name: valor_desembolsado
+            description: Valor en pesos, ya convertido a número.
+          - name: longitud
+            description: Longitud extraída del objeto GeoJSON del origen.
+          - name: latitud
+            description: Latitud extraída del objeto GeoJSON del origen.

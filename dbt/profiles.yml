@@ -1,0 +1,12 @@
+# Perfil de dbt para DuckDB.
+#
+# La ruta del warehouse se puede sobrescribir con la variable de entorno
+# PIPELINE_DUCKDB; por defecto apunta al archivo que genera el pipeline.
+movilizacion_financiera:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "{{ env_var('PIPELINE_DUCKDB', 'data/warehouse.duckdb') }}"
+      schema: marts
+      threads: 4

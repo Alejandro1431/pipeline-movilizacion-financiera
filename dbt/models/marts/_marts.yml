@@ -1,0 +1,106 @@
+version: 2
+
+models:
+  - name: dim_tiempo
+    description: Dimensión de tiempo con un registro por mes presente en los hechos.
+    columns:
+      - name: periodo
+        description: Clave natural de la dimensión.
+        tests:
+          - unique
+          - not_null
+      - name: anio
+        tests:
+          - not_null
+      - name: trimestre
+        tests:
+          - accepted_values:
+              values: [1, 2, 3, 4]
+
+  - name: dim_geografia
+    description: Dimensión geográfica con un registro por municipio.
+    columns:
+      - name: codigo_municipio
+        description: Código DANE de cinco dígitos. Clave natural de la dimensión.
+        tests:
+          - unique
+          - not_null
+      - name: departamento
+        tests:
+          - not_null
+
+  - name: dim_intermediario
+    description: >
+      Dimensión de intermediarios financieros. El grano es (nombre, tipo) y no
+      solo el nombre, porque una entidad puede cambiar de tipo con el tiempo y el
+      cambio se representa con su periodo de vigencia en vez de sobrescribirse.
+      Los nombres vienen anonimizados por el publicador, así que la dimensión
+      sirve para agrupar por tipo de entidad, no para identificar entidades.
+    columns:
+      - name: id_intermediario
+        description: Hash de (nombre, tipo). Clave de la dimensión.
+        tests:
+          - unique
+          - not_null
+      - name: nombre_intermediario
+        tests:
+          - not_null
+      - name: tipo_intermediario
+        tests:
+          - not_null
+      - name: vigente_desde
+        description: Primer mes en el que la entidad reportó con ese tipo.
+        tests:
+          - not_null
+      - name: vigente_hasta
+        description: Último mes en el que la entidad reportó con ese tipo.
+        tests:
+          - not_null
+
+  - name: fct_movilizacion_municipio
+    description: Hechos de movilización mensual por municipio.
+    columns:
+      - name: periodo
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tiempo')
+              field: periodo
+      - name: codigo_municipio
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_geografia')
+              field: codigo_municipio
+      - name: valor_movilizado
+        tests:
+          - not_null
+
+  - name: fct_movilizacion_intermediario
+    description: Hechos de movilización mensual por intermediario financiero.
+    columns:
+      - name: periodo
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_tiempo')
+              field: periodo
+      - name: id_intermediario
+        tests:
+          - not_null
+          - relationships:
+              to: ref('dim_intermediario')
+              field: id_intermediario
+      - name: nombre_intermediario
+        tests:
+          - not_null
+
+  - name: mart_movilizacion_departamento_mes
+    description: Movilización agregada por departamento y mes, lista para consumo.
+    columns:
+      - name: departamento
+        tests:
+          - not_null
+      - name: valor_movilizado
+        tests:
+          - not_null
