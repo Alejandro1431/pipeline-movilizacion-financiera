@@ -1,0 +1,19 @@
+# Lo que no tiene por qué entrar en la imagen.
+.git
+.github
+.venv
+venv
+__pycache__
+*.py[cod]
+.pytest_cache
+.ruff_cache
+
+# Datos generados y artefactos de dbt: se reconstruyen al ejecutar.
+data
+*.duckdb
+dbt/target
+dbt/logs
+dbt/dbt_packages
+dbt/.user.yml
+
+.env

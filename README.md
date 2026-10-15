@@ -8,7 +8,7 @@ Findeter, los dejo en Parquet particionado, los tipé en DuckDB y construyo enci
 un modelo dimensional con dbt. Cada carga pasa por reglas de calidad que cortan el
 proceso cuando algo no cuadra.
 
-En números: 194.832 filas de 3 fuentes, 15 reglas de calidad, 50 pruebas de Python
+En números: 194.832 filas de 3 fuentes, 15 reglas de calidad, 88 pruebas de Python
 y 29 de dbt, y unos 40 segundos de ejecución completa (21 en carga incremental).
 
 ## Qué responde
@@ -98,10 +98,25 @@ python -m pipeline perfil       # cifras del warehouse
 La carpeta `data/` no se versiona. La primera ejecución descarga unos 3 MB desde
 la API pública.
 
+Con Docker, sin instalar nada más que Docker:
+
+```bash
+docker build -t pipeline-movilizacion-financiera .
+docker run --rm -v "$PWD/data:/app/data" pipeline-movilizacion-financiera
+docker run --rm -v "$PWD/data:/app/data" pipeline-movilizacion-financiera perfil
+```
+
+Y con `make` los mismos comandos quedan más cortos (`make ayuda` los lista):
+`make entorno`, `make pruebas`, `make lint`, `make cobertura`, `make pipeline`,
+`make incremental`, `make marts`, `make perfil`.
+
 ## Estructura
 
 ```
 .
+├── Dockerfile                   # imagen reproducible, sin datos dentro
+├── Makefile                     # atajos: entorno, pruebas, lint, pipeline
+├── pyproject.toml               # versión de Python, configuración de pytest y ruff
 ├── config/sources.json          # definición de cada fuente (dataset, grano, partición)
 ├── sql/                         # transformaciones de staging, una por fuente limpia
 ├── dbt/                         # modelo dimensional
@@ -123,7 +138,7 @@ la API pública.
 │   ├── quality.py               # reglas de calidad del staging y del crudo
 │   ├── perfil.py                # perfilado del warehouse
 │   └── cli.py                   # interfaz de línea de comandos
-├── tests/                       # 50 pruebas de Python, sin red (DuckDB en memoria o temporal)
+├── tests/                       # 88 pruebas de Python, sin red (DuckDB en memoria o temporal)
 └── data/                        # generado, ignorado por git
 ```
 

@@ -45,7 +45,7 @@ Un pipeline ELT que va de la API pública a un warehouse consultable:
 | Cobertura | enero 2009 a septiembre 2026 |
 | Modelos de dbt | 6 |
 | Reglas de calidad | 15 |
-| Pruebas | 50 de Python y 29 de dbt |
+| Pruebas | 88 de Python y 29 de dbt |
 | Ahorro de la carga incremental | 93% menos transferencia |
 | Tiempo de ejecución | unos 40 segundos completo, 21 incremental |
 
