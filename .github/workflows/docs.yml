@@ -1,0 +1,66 @@
+name: documentacion
+
+# Genera la documentación del modelo dimensional con dbt (linaje, descripciones
+# y pruebas) y la publica en GitHub Pages, para poder enlazarla desde el README
+# y desde el portafolio.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'dbt/**'
+      - 'src/**'
+      - 'config/**'
+      - '.github/workflows/docs.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  documentar:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.desplegar.outputs.page_url }}
+    env:
+      PYTHONPATH: src
+      PYTHONIOENCODING: utf-8
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Construir el warehouse y el modelo
+        # dbt docs generate lee el catálogo del warehouse, así que los modelos
+        # tienen que existir antes.
+        run: python -m pipeline all
+
+      - name: Generar la documentación de dbt
+        run: dbt docs generate --project-dir dbt --profiles-dir dbt
+        env:
+          PIPELINE_DUCKDB: ${{ github.workspace }}/data/warehouse.duckdb
+
+      - name: Preparar el sitio
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dbt/target
+
+      - name: Publicar en GitHub Pages
+        id: desplegar
+        uses: actions/deploy-pages@v4

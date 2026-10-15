@@ -1,0 +1,95 @@
+name: pipeline
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    # Todos los lunes a las 06:00 UTC, para detectar si el origen cambia.
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      PYTHONIOENCODING: utf-8
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dependencias
+        run: pip install -r requirements.txt
+
+      - name: Pruebas unitarias
+        run: pytest -q
+
+      - name: Pipeline completo (extract + transform + marts + quality)
+        run: python -m pipeline all
+
+      - name: Flujo orquestado con Prefect
+        run: python -m pipeline flujo
+
+      - name: Carga incremental (comprueba que no duplica)
+        run: python -m pipeline all --incremental
+
+      - name: Perfil del warehouse
+        run: python -m pipeline perfil
+
+      - name: Guardar el informe de calidad
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: informe-calidad
+          path: data/calidad.json
+          if-no-files-found: warn
+
+  nube:
+    name: crudo en un bucket S3
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+      PYTHONIOENCODING: utf-8
+      PIPELINE_ALMACEN: s3
+      PIPELINE_S3_ENDPOINT: localhost:9000
+      PIPELINE_S3_BUCKET: pipeline-crudo
+      PIPELINE_S3_ACCESO: pruebas
+      PIPELINE_S3_SECRETO: pruebas
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v4
+
+      - name: Preparar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Instalar dependencias
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Pipeline completo con el crudo en el bucket
+        run: |
+          moto_server -p 9000 &
+          for intento in $(seq 1 40); do
+            if python -c "import socket;socket.create_connection(('127.0.0.1',9000),2)" 2>/dev/null; then
+              echo "servidor S3 listo tras $intento intentos"
+              break
+            fi
+            sleep 1
+          done
+          python -m pipeline all
+
+      - name: Comprobar que los objetos estan en el bucket
+        run: python -m pipeline almacen
